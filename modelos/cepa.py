@@ -1,16 +1,24 @@
-from entidadvineria import EntidadVineria
+from .entidadvineria import EntidadVineria
 
 class Cepa(EntidadVineria):
+    def __init__(self, id, nombre):
+        super().__init__(id, nombre)
+
+    def obtenerVinos(self):
+        from vinoteca import Vinoteca
+        vinos = Vinoteca.obtenerVinos()
+        return [vino for vino in vinos if self in vino.obtenerCepas()]
+
     def convertirAJSON(self):
-        return {"id": self.id, "nombre": self.nombre}
+        return {
+            "id": self.obtenerId(),
+            "nombre": self.obtenerNombre(),
+            "vinos": len(self.obtenerVinos())
+        }
 
     def convertirAJSONFull(self):
         return {
-            "id": self.id,
-            "nombre": self.nombre,
-            "vinos": [f"{v.obtenerNombre()} ({v.obtenerBodega().obtenerNombre()})" for v in self.obtenerVinos()]
+            "id": self.obtenerId(),
+            "nombre": self.obtenerNombre(),
+            "vinos": [f"{vino.obtenerNombre()} ({vino.obtenerBodega().obtenerNombre()})" for vino in self.obtenerVinos()]
         }
-
-    def obtenerVinos(self):
-        from vinoteca import Vinoteca  # Importación diferida
-        return Vinoteca.obtenerVinosPorCepa(self.id)
