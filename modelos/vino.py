@@ -1,30 +1,28 @@
-import json
+from entidadvineria import EntidadVineria
 
-
-class Vino:
-
-    def __repr__(self):
-        return json.dumps({"nombre": self.obtenerNombre()})
+class Vino(EntidadVineria):
+    def __init__(self, id, nombre, bodega, cepas, partidas):
+        super().__init__(id, nombre)
+        self.bodega = bodega
+        self.cepas = cepas
+        self.partidas = partidas
 
     def convertirAJSON(self):
         return {
-            "id": self.obtenerId(),
-            "nombre": self.obtenerNombre(),
+            "id": self.id,
+            "nombre": self.nombre,
             "bodega": self.obtenerBodega().obtenerNombre(),
-            "cepas": self.__mapearCepas(),
-            "partidas": self.__partidas,
+            "cepas": [c.obtenerNombre() for c in self.obtenerCepas()],
+            "partidas": self.partidas
         }
 
     def convertirAJSONFull(self):
-        return {
-            "id": self.obtenerId(),
-            "nombre": self.obtenerNombre(),
-            "bodega": self.obtenerBodega().obtenerNombre(),
-            "cepas": self.__mapearCepas(),
-            "partidas": self.__partidas,
-        }
+        return self.convertirAJSON()
 
-    def __mapearCepas(self):
-        cepas = self.obtenerCepas()
-        cepasMapa = map(lambda a: a.obtenerNombre(), cepas)
-        return list(cepasMapa)
+    def obtenerBodega(self):
+        from vinoteca import Vinoteca  # Importación diferida
+        return Vinoteca.buscarBodega(self.bodega)
+
+    def obtenerCepas(self):
+        from vinoteca import Vinoteca  # Importación diferida
+        return Vinoteca.obtenerCepasDeVino(self.cepas)
